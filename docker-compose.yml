@@ -1,0 +1,12 @@
+services:
+  agent-1:
+    build: .
+    restart: unless-stopped
+    environment:
+      - WAZUH_AGENT_NAME=docker-composte-agent
+      - WAZUH_AGENT_GROUP=default
+      - WAZUH_MANAGER=host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # volumes:
+    #  - /var/log/:/logs/:ro

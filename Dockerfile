@@ -1,18 +1,25 @@
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 
-LABEL maintainer "NoEnv"
-LABEL version "4.3.4"
-LABEL description "Wazuh Agent"
+LABEL maintainer="sn0b4ll@isecng"
+LABEL version="4.8.0"
+LABEL description="Wazuh Agent"
 
-COPY entrypoint.sh ossec.conf /
+COPY entrypoint.sh /
 
 RUN apt-get update && apt-get install -y \
-  procps curl apt-transport-https gnupg2 inotify-tools python-docker && \
-  curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add - && \
-  echo "deb https://packages.wazuh.com/4.x/apt/ stable main" | tee /etc/apt/sources.list.d/wazuh.list && \
-  apt-get update && \
-  apt-get install -y wazuh-agent=4.3.4-1 && \
-  mv /ossec.conf /var/ossec/etc/ && \
-  rm -rf /var/lib/apt/lists/*
+  procps curl apt-transport-https gnupg2 inotify-tools
+
+RUN curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
+
+RUN echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
+  
+RUN apt-get update
+
+# Set the deployment varibales beforehand, see here: https://documentation.wazuh.com/current/user-manual/agent/deployment-variables/deployment-variables-linux.html
+# WAZUH_AGENT_NAME
+# WAZUH_AGENT_GROUP
+# WAZUH_MANAGER
+# WAZUH_MANAGER_PORT
+# WAZUH_REGISTRATION_PASSWORD
 
 ENTRYPOINT ["/entrypoint.sh"]

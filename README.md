@@ -1,29 +1,25 @@
-[![Docker Pulls](https://badgen.net/docker/pulls/noenv/wazuh-agent)](https://hub.docker.com/r/noenv/wazuh-agent)
-[![Quay.io Enabled](https://badgen.net/badge/quay%20pulls/enabled/green)](https://quay.io/repository/noenv/wazuh-agent)
-[![build](https://github.com/NoEnv/docker-wazuh-agent/actions/workflows/build.yml/badge.svg)](https://github.com/NoEnv/docker-wazuh-agent/actions/workflows/build.yml)
+# docker-wazuh-agent
 
-## docker-wazuh-agent
-
-#### Description
+## Description
 
 Wazuh Agent as Docker Image.
 
-#### Run
+! This does not monitor the host systems by default, since there are no volumes mounted by default !
 
-most simple way of running the container
+This can be useful if you have an log-collection-client which should use multiple instances of agents to send logs to an wazuh manager.
 
-    docker run --rm noenv/wazuh-agent
+## Run
 
-advanced usage
+### docker run
+Steps to start the agent
+1. Build the image with `docker build ."
+2. Tun the container itself:
+```
+docker run -e WAZUH_MANAGER='host.docker.internal' --add-host=host.docker.internal:host-gateway <your-container-name-or-id> 
+```
+### docker compose
 
-    docker run -d --name wazuh -v /:/rootfs:ro --net host --hostname ${HOSTNAME} \
-      -e JOIN_MANAGER=172.17.0.1 -e JOIN_GROUPS=default,test -e JOIN_PASSWORD=test123 \
-      -v /etc/os-release:/etc/os-release \
-      -v /var/run/docker.sock:/var/run/docker.sock \
-      -v /var/ossec/ossec.conf:/var/ossec/etc/ossec.conf \
-      -v /var/ossec/local_internal_options.conf:/var/ossec/etc/local_internal_options.conf \
-      -v /var/ossec/client.keys:/var/ossec/etc/client.keys noenv/wazuh-agent
+By default the agent connects to a local hosted wazuh instance. Please adjust `docker-compose.yml` accordingly, afterward simply run `docker compose up`.
 
-#### Source
-
-https://github.com/noenv/docker-wazuh-agent
+## Credits
+Based on https://github.com/noenv/docker-wazuh-agent
